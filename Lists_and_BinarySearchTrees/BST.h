@@ -6,12 +6,14 @@ class BST
 public:
 	BST() {
 		H = nullptr;
-		//H.setVal(v);
+	
+	//H.setVal(v);
 	}
-
 	void addElem(int v);
 
-	void rem(int v);
+	node* search(int v);
+	void removeByPointer(node* ptr);
+	void removeByValue(int v);
 	void rot();
 
 	void preorder(); //KLP

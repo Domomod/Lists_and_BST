@@ -12,10 +12,6 @@ public:
 		R = nullptr;
 	}
 	~node() {
-
-		F = nullptr;
-		L = nullptr;
-		R = nullptr;
 	}
 
 	//setters
@@ -35,11 +31,15 @@ public:
 		while (temp->nextL() != nullptr) {
 			temp = temp->nextL();
 		}
-		return this;
+		return temp;
 	}
 
 	node* maxRight(){
-		
+		node* temp = this;
+		while (temp->nextR() != nullptr) {
+			temp = temp->nextR();
+		}
+		return temp;
 	}
 
 	//operatory
