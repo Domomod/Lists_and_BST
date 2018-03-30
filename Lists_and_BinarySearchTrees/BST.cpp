@@ -3,6 +3,20 @@
 #include "BST.h"
 #include <stack>
 
+/*	List of methods in order:
+	1.addElem
+	2.search
+	3.removeByPointer
+	4.removeByValue
+	5.rotate
+	6.preorder
+	ToDO:
+	7.inorder
+	8.preorder
+*/
+
+
+////////*			ADD ELEMENT			*////////
 void BST::addElem(int v) {
 	node* ptr = H;
 	node* last = nullptr;
@@ -57,6 +71,8 @@ void BST::addElem(int v) {
 	}
 }
 
+
+////////*			SEARCH			*////////
 node* BST::search(int v) {
 	node* ptr = H;
 	while (true)
@@ -82,17 +98,18 @@ node* BST::search(int v) {
 	}
 }
 
+
+////////*			REMOVE BY POINTER			*////////
 void BST::removeByPointer(node* ptr){
 	printf("%d\t", ptr);
 	node* last = ptr->prevF();
-	int v = ptr->getVal();
 	if (ptr->nextL() == nullptr && ptr->nextR() == nullptr) {
 		/*	In this case the elem we seek to delete is a leaf,
 		this means it has no children.	*/
-		printf("%d was a leaf, I am removing it.\n", v);
+		printf("%d was a leaf, I am removing it.\n", ptr->getVal());
 		if (last != nullptr) {
 			//chech if it's not the root of the BST
-			if (*last < v) {
+			if (*last < ptr->getVal()) {
 				last->setR(nullptr);
 			}
 			else {
@@ -106,39 +123,73 @@ void BST::removeByPointer(node* ptr){
 		We switch it's position with the smallest child
 		in right branch.*/
 		node* child = ptr->nextR()->maxLeft();
-		ptr->setVal(child->getVal());
-		printf("%d had both children, I am replacing it. It's left child is %d.\n", v, ptr->nextL()->getVal());
+		/*It is crucial to assign the value after we call removeByPointer,
+		otherwise we might end up comparing child value with the freshly changed
+		element (and that would be wrong, we have to compare it with the unchanged value).
+		This might occur when the most left child of our right child is the right child 
+		itself.*/
+		int remember = child->getVal();
+		printf("%d had both children, I am replacing it. It's left child is %d.\n", ptr->getVal(), ptr->nextL()->getVal());
 		removeByPointer(child);
+		printf("I replaced it with %d. It's left child is %d.\n", ptr->getVal(), ptr->nextL()->getVal());
+		ptr->setVal(remember);
 	}
-	else if (ptr->nextR() != nullptr) {
-		/*	Elem we seek to destroy has right child only.	*/
-		if (*last < v) {
-			last->setR(ptr->nextR());
+	else {
+		/*	Elem we seek to destroy has one child only.	*/
+		
+		/*this part decides which pointer to use
+			-to left child
+			-to right child		*/
+		node* which;
+		if (ptr->nextL() != nullptr) {
+			which = ptr->nextL();
 		}
 		else {
-			last->setL(ptr->nextR());
+			which = ptr->nextR();
 		}
-		printf("%d had one child(%d), I am removing it.\n", v, ptr->nextR());
-		delete ptr;
-	}
-	else if (ptr->nextL() != nullptr) {
-		/*	Elem we seek to destroy has left child only.	*/
-		if (*last < v) {
-			last->setR(ptr->nextL());
+
+
+		if (last == nullptr) {
+		/*	if we are deleting the root,
+		the algorithm is a piece of cake,
+		we simple change root to point 
+		on the child	*/
+			H = which;
 		}
 		else {
-			last->setL(ptr->nextL());
+		/*	We have to chech if we need to change 
+		our left pointer or right pointer, it depends
+		if our father has*/
+			if (*last < *ptr) {
+				last->setR(which);
+			}
+			else {
+				last->setL(which);
+			}
 		}
-		printf("%d had one child(%d), I am removing it.\n", v, ptr->nextL());
+		printf("%d had one child(%d), I am removing it.\n", ptr->getVal(), which);
 		delete ptr;
 	}
 }
 
+////////*		REMOVE ELEMENT BY VALUE			*////////
 void BST::removeByValue(int v) {
-	removeByPointer(search(v));
+	node* check = search(v);
+	if (check != nullptr){
+		removeByPointer(check);
+	}
 }
 
 
+void BST::rotate(node* ptr) {
+	while (ptr->prevF() != nullptr) {
+		//check if AVL
+		//if so continue
+		//else check if PP, PL, LP, or LL
+	}
+}
+
+////////*		LIST ELEMENTS PREORDER			*////////
 void BST::preorder(){
 	if (H == nullptr) {
 		return;
@@ -170,9 +221,45 @@ void BST::inorder() {
 	if (H == nullptr) {
 		return;
 	}
-	
-	node* ptr = H;
-	while (ptr->nextL() != nullptr) {
-
+	std::stack<node *> nodeStack;
+	node* temp = H;
+	while (!nodeStack.empty() || temp) {
+		if (temp) {
+			nodeStack.push(temp);
+			temp = temp->nextL();
+		}
+		else {
+			temp = nodeStack.top();
+			nodeStack.pop();
+			printf("%d ", temp->getVal());
+			temp = temp->nextR();
+		}
 	}
+	printf("\n");
+}
+
+void BST::postorder() {
+	if (H == nullptr) {
+		return;
+	}
+	std::stack<node *> nodeStack;
+	nodeStack.push(H);
+	node* last = nullptr;
+	node* temp = nullptr;
+	while (!nodeStack.empty()) {
+		temp = nodeStack.top();
+		if (!last || last->nextL() == temp || last->nextR() == temp) {
+			/*We check wheter we go up or down the tree*/
+			if (temp->nextL()) nodeStack.push(temp->nextL());
+			else if (temp->nextR()) nodeStack.push(temp->nextR());
+		}
+		else if (temp->nextL() != last) {
+			printf("%d ", temp->getVal());
+			nodeStack.pop();
+		}
+		else if (temp->nextR()) nodeStack.push(temp->nextR());
+		last = temp;
+	}
+	printf("\n");
+}
 }

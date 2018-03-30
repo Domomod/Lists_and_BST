@@ -14,11 +14,11 @@ public:
 	node* search(int v);
 	void removeByPointer(node* ptr);
 	void removeByValue(int v);
-	void rot();
+	void rotate();
 
 	void preorder(); //KLP
 	void inorder();
-	void lpk();
+	void postorder();
 
 private:
 	node * H;
