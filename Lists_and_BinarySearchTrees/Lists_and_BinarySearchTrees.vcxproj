@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AVL.h" />
     <ClInclude Include="BST.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="resource.h" />
@@ -154,6 +155,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AVL.cpp" />
     <ClCompile Include="BST.cpp" />
     <ClCompile Include="Lists_and_BinarySearchTrees.cpp" />
     <ClCompile Include="stdafx.cpp">

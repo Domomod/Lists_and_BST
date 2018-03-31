@@ -2,47 +2,36 @@
 
 #include "BST.h"
 #include <stack>
-
-/*	List of methods in order:
-	1.addElem
-	2.search
-	3.removeByPointer
-	4.removeByValue
-	5.rotate
-	6.preorder
-	ToDO:
-	7.inorder
-	8.preorder
-*/
+#include <queue>
+#include <algorithm> //for max
 
 
-////////*			ADD ELEMENT			*////////
 void BST::addElem(int v) {
 	node* ptr = H;
 	node* last = nullptr;
 
 	while (true)
-	/*	The loop ends when the first if condition is fulfilled.	*/
+		/*	The loop ends when the first if condition is fulfilled.	*/
 	{
 		if (ptr == nullptr)
-		/*	We have crossed the end of a branch,
-		we schould create a new element here.	*/
+			/*	We have crossed the end of a branch,
+			we schould create a new element here.	*/
 		{
 			ptr = new node;
 			ptr->setVal(v);
 			if (last != nullptr) {
-			/*	We check if the BStree wasn't empty when
-			we called addElem(v), if it is empty there is no Father/Root,
-			we can't point any pointers to or from him.	*/
+				/*	We check if the AVLree wasn't empty when
+				we called addElem(v), if it is empty there is no Father/Root,
+				we can't point any pointers to or from him.	*/
 				if (*last <= v) {
-				/*	Value v is bigger or equal the value of last node,
-				we are the right child for last node.	*/
+					/*	Value v is bigger or equal the value of last node,
+					we are the right child for last node.	*/
 					last->setR(ptr);
 					ptr->setF(last);
 				}
 				else {
-				/*	Value v is less than the value of last node,
-				we are the left child for last node.	*/
+					/*	Value v is less than the value of last node,
+					we are the left child for last node.	*/
 					last->setL(ptr);
 					ptr->setF(last);
 				}
@@ -51,19 +40,20 @@ void BST::addElem(int v) {
 				H = ptr;
 			}
 			printf("creating new elem\n");
+			rotate(ptr);
 			return;
 		}
 		else if (*ptr <= v) {
-		/*	We are pointing on an element that's value is smaller/equal 
-		to the value v we go right. */
+			/*	We are pointing on an element that's value is smaller/equal
+			to the value v we go right. */
 			last = ptr;
 
 			ptr = ptr->nextR();
 			printf("v >= H\n");
 		}
 		else {
-		/*	We are pointing on an element that's value is bigger
-		to the value v we go left. */
+			/*	We are pointing on an element that's value is bigger
+			to the value v we go left. */
 			last = ptr;
 			ptr = ptr->nextL();
 			printf("v < H\n");
@@ -72,7 +62,6 @@ void BST::addElem(int v) {
 }
 
 
-////////*			SEARCH			*////////
 node* BST::search(int v) {
 	node* ptr = H;
 	while (true)
@@ -99,16 +88,15 @@ node* BST::search(int v) {
 }
 
 
-////////*			REMOVE BY POINTER			*////////
-void BST::removeByPointer(node* ptr){
-	printf("%d\t", ptr);
+void BST::removeByPointer(node* ptr) {
+	printf("%d\t", (int)ptr);
 	node* last = ptr->prevF();
 	if (ptr->nextL() == nullptr && ptr->nextR() == nullptr) {
 		/*	In this case the elem we seek to delete is a leaf,
 		this means it has no children.	*/
 		printf("%d was a leaf, I am removing it.\n", ptr->getVal());
 		if (last != nullptr) {
-			//chech if it's not the root of the BST
+			//chech if it's not the root of the AVL
 			if (*last < ptr->getVal()) {
 				last->setR(nullptr);
 			}
@@ -117,6 +105,9 @@ void BST::removeByPointer(node* ptr){
 			}
 		}
 		delete ptr;
+		if (last != nullptr) {
+			rotate(last);
+		}
 	}
 	else if (ptr->nextL() != nullptr && ptr->nextR() != nullptr) {
 		/*	Elem we seek to destroy has both children.
@@ -126,7 +117,7 @@ void BST::removeByPointer(node* ptr){
 		/*It is crucial to assign the value after we call removeByPointer,
 		otherwise we might end up comparing child value with the freshly changed
 		element (and that would be wrong, we have to compare it with the unchanged value).
-		This might occur when the most left child of our right child is the right child 
+		This might occur when the most left child of our right child is the right child
 		itself.*/
 		int remember = child->getVal();
 		printf("%d had both children, I am replacing it. It's left child is %d.\n", ptr->getVal(), ptr->nextL()->getVal());
@@ -136,10 +127,10 @@ void BST::removeByPointer(node* ptr){
 	}
 	else {
 		/*	Elem we seek to destroy has one child only.	*/
-		
+
 		/*this part decides which pointer to use
-			-to left child
-			-to right child		*/
+		-to left child
+		-to right child		*/
 		node* which;
 		if (ptr->nextL() != nullptr) {
 			which = ptr->nextL();
@@ -150,16 +141,15 @@ void BST::removeByPointer(node* ptr){
 
 
 		if (last == nullptr) {
-		/*	if we are deleting the root,
-		the algorithm is a piece of cake,
-		we simple change root to point 
-		on the child	*/
+			/*	if we are deleting the root,
+			the algorithm is a piece of cake,
+			we simple change root to point
+			on the child	*/
 			H = which;
 		}
 		else {
-		/*	We have to chech if we need to change 
-		our left pointer or right pointer, it depends
-		if our father has*/
+			/*	We have to chech if we need to change
+			our left pointer or right pointer.*/
 			if (*last < *ptr) {
 				last->setR(which);
 			}
@@ -167,12 +157,13 @@ void BST::removeByPointer(node* ptr){
 				last->setL(which);
 			}
 		}
-		printf("%d had one child(%d), I am removing it.\n", ptr->getVal(), which);
+		printf("%d had one child(%d), I am removing it.\n", ptr->getVal(), (int)which);
 		delete ptr;
+		rotate(last);
 	}
 }
 
-////////*		REMOVE ELEMENT BY VALUE			*////////
+
 void BST::removeByValue(int v) {
 	node* check = search(v);
 	if (check != nullptr){
@@ -181,15 +172,6 @@ void BST::removeByValue(int v) {
 }
 
 
-void BST::rotate(node* ptr) {
-	while (ptr->prevF() != nullptr) {
-		//check if AVL
-		//if so continue
-		//else check if PP, PL, LP, or LL
-	}
-}
-
-////////*		LIST ELEMENTS PREORDER			*////////
 void BST::preorder(){
 	if (H == nullptr) {
 		return;
@@ -238,10 +220,11 @@ void BST::inorder() {
 	printf("\n");
 }
 
+
 void BST::postorder() {
 	if (H == nullptr) {
 		return;
-	}
+	}	
 	std::stack<node *> nodeStack;
 	nodeStack.push(H);
 	node* last = nullptr;
@@ -261,5 +244,4 @@ void BST::postorder() {
 		last = temp;
 	}
 	printf("\n");
-}
 }
