@@ -5,7 +5,7 @@
 //  Created by Krzysztof Sychla on 27.03.2018.
 //  Copyright © 2018 Krzysztof Sychla. All rights reserved.
 //
-
+#include "stdafx.h"
 #include "listy.hpp"
 #include <stdio.h>
 
