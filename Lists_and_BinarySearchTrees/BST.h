@@ -14,12 +14,16 @@ public:
 	node* search(int v);
 	void removeByPointer(node* ptr);
 	void removeByValue(int v);
-	void rot();
+
+	virtual void rotate(node* ptr) {}
 
 	void preorder(); //KLP
-	void inorder();
-	void lpk();
+	void inorder(); //LKP
+	void postorder(); //LPK
 
-private:
+	node* getRoot() { return H; }
+
+protected:
 	node * H;
+private:
 };
