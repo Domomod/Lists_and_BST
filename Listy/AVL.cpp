@@ -5,9 +5,91 @@
 #include <algorithm> //for max
 
 
-void AVL::rotate(node* ptr) {
-	while (ptr != nullptr) {
-		node* anchor = ptr->prevF();
+void LR(node * & root, node * A)
+{
+	node* B = A->nextL();
+	node* C = B->nextR();
+	node* p = A->prevF();
+
+	B->setR(C->nextL());
+
+	A->setL(C->nextR());
+
+	C->setR(A);
+	C->setL(B);
+
+	if (p != nullptr)
+	{
+		if (p->nextL() == A) p->setL(C);
+		else p->setR(C);
+	}
+	else root = C;
+}
+
+void RL(node * & root, node * A)
+{
+	node* B = A->nextR();
+	node* C = B->nextL();
+	node* p = A->prevF();
+
+	B->setL(C->nextR());
+
+	A->setR(C->nextL());
+
+	C->setL(A);
+	C->setR(B);
+
+	if (p != nullptr)
+	{
+		if (p->nextL() == A) p->setL(C);
+		else p->setR(C);
+	}
+	else root = C;
+}
+
+void LL(node * & root, node * A)
+{
+	node* B = A->nextL();
+	node* p = A->prevF();
+
+	A->setL(B->nextR());
+
+	B->setF(p);
+	B->setR(A);
+	A->setF(B);
+
+	if (p != nullptr)
+	{
+		if (p->nextL() == A) p->setL(B);
+		else p->setR(B);
+	}
+	else root = B;
+}
+
+void RR(node * & root, node * A)
+{
+	node* B = A->nextR();
+	node* p = A->prevF();
+
+	A->setR(B->nextL());
+
+	B->setF(p);
+	B->setL(A);
+	A->setF(B);
+
+	if (p != nullptr)
+	{
+		if (p->nextL() == A) p->setL(B);
+		else p->setR(B);
+	}
+	else root = B;
+}
+
+
+void AVL::rotate(node* iter) {
+	while (iter != nullptr) {
+		node* anchor = iter->prevF();
+		node* ptr = iter;
 		if (!isSubTreeAVL(ptr)) {
             printf("\nUpcoming rotation.\n");
 			int rrLen = 0;
@@ -31,37 +113,14 @@ void AVL::rotate(node* ptr) {
 						   ptr								A
 						  /   \							  /   \
 						 c     A						ptr    e
-					    c     / \					   /   \    e
+						c     / \					   /   \    e
 					 |	     p	 e	 		====>	  c     p    e
 					 |	  	p	  e	 				 c       p    e
-					2|   1|  	   e			
+					2|   1|  	   e
 					 |    |			e
 			*/
-                printf("RR\n");
-				node* A = ptr->nextR();
-				node* oldPtr = ptr;
-				node* c = ptr->nextL();
-				node* p = A->nextL();
-				node* e = A->nextR();
-
-				ptr = A;
-				ptr->setL(oldPtr);
-				ptr->setR(e);
-				ptr->setF(oldPtr->prevF());
-
-				oldPtr->setF(ptr);
-				oldPtr->setL(c);
-				oldPtr->setR(p);
-
-				if (p != nullptr) {
-					p->setF(oldPtr);
-				}
-				if (c != nullptr) {
-					c->setF(oldPtr);
-				}
-				if (e != nullptr) {
-					e->setF(ptr);
-				}
+				printf("RR\n");
+				RR(H, ptr);
 			}
 			else if (rlLen == maxLen) { /* Right node Left branch */
 			/*				|								|
@@ -75,31 +134,7 @@ void AVL::rotate(node* ptr) {
 						e	  f		v
 			*/
 				printf("RL\n");
-				node* oldPtr = ptr;
-				node* B = ptr->nextR();
-				node* A = B->nextL();
-				node* g = ptr->nextL();
-				node* e = A->nextL();
-				node* f = A->nextR();
-				node* d = B->nextR();
-
-				ptr = A;
-				ptr->setF(oldPtr->prevF());
-				ptr->setL(oldPtr);
-				ptr->setR(B);
-
-				oldPtr->setF(A);
-				oldPtr->setL(g);
-				if (g != nullptr) g->setF(oldPtr);
-				oldPtr->setR(e);
-				if (e != nullptr) e->setF(oldPtr);
-
-				B->setF(A);
-				B->setL(f);
-				if (f != nullptr)f->setF(B);
-				B->setR(d);
-				if (d != nullptr)d->setF(B);
-
+				RL(H, ptr);
 			}
 			else if (lrLen == maxLen) { /* Left node Right branch */
 			/*				|								|
@@ -109,34 +144,11 @@ void AVL::rotate(node* ptr) {
 					  /   \     g					    / \	  / \
 					 d	   A		^		====>	   d   e f   g
 					d	  / \		|				   d   e f   g
-					     e   f		|	2			
+						 e   f		|	2
 						e	  f		v
 			*/
 				printf("LR\n");
-				node* oldPtr = ptr;
-				node* B = ptr->nextL();
-				node* A = B->nextR();
-				node* d = B->nextL();
-				node* e = A->nextL();
-				node* f = A->nextR();
-				node* g = ptr->nextR();
-
-				ptr = A;
-				ptr->setF(oldPtr->prevF());
-				ptr->setL(B);
-				ptr->setR(oldPtr);
-
-				B->setF(ptr);
-				B->setL(d);
-				if (d != nullptr)d->setF(B);
-				B->setR(e);
-				if (e != nullptr)e->setF(B);
-
-				oldPtr->setF(ptr);
-				oldPtr->setL(f);
-				if (f != nullptr)f->setF(oldPtr);
-				oldPtr->setR(g);
-				if (g != nullptr)g->setF(oldPtr);
+				LR(H, ptr);
 			}
 			else { /* Left node Left branch */
 			/*				|								|
@@ -150,27 +162,10 @@ void AVL::rotate(node* ptr) {
 					e     |1	   |
 			*/
                 printf("LL\n");
-				node* A = ptr->nextL();
-				node* oldPtr = ptr;
-				node* c = ptr->nextR();
-				node* p = A->nextL();
-				node* e = A->nextR();
-
-				ptr = A;
-				ptr->setF(oldPtr->prevF());
-				ptr->setR(oldPtr);
-				ptr->setL(e);
-				if (e != nullptr)e->setF(ptr);
-				
-
-				oldPtr->setF(ptr);
-				oldPtr->setL(p);
-				if (p != nullptr)p->setF(ptr);
-				oldPtr->setR(c);
-				if (c != nullptr)c->setF(ptr);
+				LL(H, ptr);
 			}
 		}
-		ptr = ptr->prevF();
+		iter = anchor;
 	}
 }
 

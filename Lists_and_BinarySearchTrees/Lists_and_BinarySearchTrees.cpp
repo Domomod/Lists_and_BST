@@ -90,6 +90,8 @@ int main(int argc, const char * argv[]) {
         time.EndTimer();
         printf("Creating list took: %lld\n",time.GetDelta());
 
+		tree.inorder();
+
         printf("Deleting whole tree for %d elements\n",sizes[sizeIdx]);
         time.StartTimer();
         tree.postorder();
@@ -103,5 +105,6 @@ int main(int argc, const char * argv[]) {
     dane.close();
     list_file.close();
     tree_file.close();
+	_getch();
     return 0;
 }

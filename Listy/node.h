@@ -17,8 +17,16 @@ public:
 	//setters
 	void setVal(int v) { val = v; }
 	void setF(node* f) { F = f; }
-	void setL(node* l) { L = l; }
-	void setR(node* r) { R = r; }
+	void setL(node* l) { 
+		L = l;
+		if (l != nullptr)
+			l->setF(this);
+	}
+	void setR(node* r) { 
+		R = r; 
+		if (R != nullptr)
+			R->setF(this);
+	}
 
 	//getters
 	int getVal() { return val; }
