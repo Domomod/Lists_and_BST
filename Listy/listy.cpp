@@ -72,7 +72,6 @@ void List::add(int element){
      SimpleNode *temp = head;
      while(temp){
          if(temp->value == value){
-             printf("%d ",temp->value);
              return temp;
          }
          temp = temp->next;

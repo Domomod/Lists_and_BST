@@ -6,18 +6,24 @@ class BST
 public:
 	BST() {
 		H = nullptr;
-		//H.setVal(v);
+	
+	//H.setVal(v);
 	}
-
 	void addElem(int v);
 
-	void rem(int v);
-	void rot();
+	node* search(int v);
+	void removeByPointer(node* ptr);
+	void removeByValue(int v);
+
+	virtual void rotate(node* ptr) {}
 
 	void preorder(); //KLP
 	void inorder(); //LKP
-  void postorder(); //LPK
+	void postorder(); //LPK
 
-private:
+	node* getRoot() { return H; }
+
+protected:
 	node * H;
+private:
 };
