@@ -56,7 +56,9 @@ void List::add(int element){
               the list and find the value
               we are looking for, then delete it */
              if(value == head->value){
-                 head = temp->next;
+				 before = temp;
+				 head = temp->next;
+				 delete before;
                  return;
              }
              before->next = temp->next;
@@ -93,8 +95,9 @@ void List::del_all(){
     while(temp){
         /* we delete all elements,
          starting with the head */
-        del(temp->value);
-        temp = temp->next;
+		SimpleNode* last = temp;
+		temp = temp->next;
+        del(last->value);
     }
 }
 

@@ -9,7 +9,7 @@ public:
 	
 	//H.setVal(v);
 	}
-	void rotate(node* ptr);
+	void rotate(node* & ptr);
 
 	static int subTreeLength(node* ptr);
 	static bool isSubTreeAVL(node* ptr);

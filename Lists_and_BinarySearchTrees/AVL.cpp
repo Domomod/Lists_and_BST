@@ -5,8 +5,9 @@
 #include <algorithm> //for max
 
 
-void LR(node * & root, node * A)
+void LR(node * & root, node * & A)
 {
+	//printf("LR");
 	node* B = A->nextL();
 	node* C = B->nextR();
 	node* p = A->prevF();
@@ -15,19 +16,37 @@ void LR(node * & root, node * A)
 
 	A->setL(C->nextR());
 
-	C->setR(A);
-	C->setL(B);
-
 	if (p != nullptr)
 	{
 		if (p->nextL() == A) p->setL(C);
 		else p->setR(C);
 	}
 	else root = C;
+
+	C->setR(A);
+	C->setL(B);
+	C->setF(p);
+
+	if (A != nullptr && B != nullptr) {
+		if (A->getHeight() > B->getHeight()) {
+			A->updateHeight();
+			B->updateHeight();
+		}
+		else {
+			B->updateHeight();
+			A->updateHeight();
+		}
+	}
+	else if (A != nullptr)
+		A->updateHeight();
+	else if (B != nullptr)
+		B->updateHeight();
 }
 
-void RL(node * & root, node * A)
+
+void RL(node * & root, node * & A)
 {
+	//printf("RL");
 	node* B = A->nextR();
 	node* C = B->nextL();
 	node* p = A->prevF();
@@ -36,133 +55,110 @@ void RL(node * & root, node * A)
 
 	A->setR(C->nextL());
 
-	C->setL(A);
-	C->setR(B);
-
 	if (p != nullptr)
 	{
 		if (p->nextL() == A) p->setL(C);
 		else p->setR(C);
 	}
 	else root = C;
+
+	C->setL(A);
+	C->setR(B);
+	C->setF(p);
+
+	if (A != nullptr && B != nullptr) {
+		if (A->getHeight() > B->getHeight()) {
+			A->updateHeight();
+			B->updateHeight();
+		}
+		else {
+			B->updateHeight();
+			A->updateHeight();
+		}
+	}
+	else if (A != nullptr)
+		A->updateHeight();
+	else if (B != nullptr)
+		B->updateHeight();
 }
 
-void LL(node * & root, node * A)
+
+void LL(node * & root, node * & A)
 {
+	//printf("LL");
 	node* B = A->nextL();
 	node* p = A->prevF();
 
 	A->setL(B->nextR());
 
-	B->setF(p);
-	B->setR(A);
-	A->setF(B);
-
 	if (p != nullptr)
 	{
 		if (p->nextL() == A) p->setL(B);
 		else p->setR(B);
 	}
 	else root = B;
+
+	B->setF(p);
+	B->setR(A);
+	A->setF(B);
+
+	A->updateHeight();
+	B->updateHeight();
+
 }
 
-void RR(node * & root, node * A)
+
+void RR(node * & root, node * & A)
 {
+	//printf("RR");
 	node* B = A->nextR();
 	node* p = A->prevF();
 
 	A->setR(B->nextL());
 
-	B->setF(p);
-	B->setL(A);
-	A->setF(B);
-
 	if (p != nullptr)
 	{
 		if (p->nextL() == A) p->setL(B);
 		else p->setR(B);
 	}
 	else root = B;
+
+	B->setF(p);
+	B->setL(A);
+	A->setF(B);
+
+	A->updateHeight();
+	B->updateHeight();
+	if (p != nullptr)
+		p->updateHeight();
 }
 
 
-void AVL::rotate(node* iter) {
+void AVL::rotate(node* & iter) {
 	while (iter != nullptr) {
 		node* anchor = iter->prevF();
 		node* ptr = iter;
 		if (!isSubTreeAVL(ptr)) {
-            printf("\nUpcoming rotation.\n");
-			int rrLen = 0;
-			int rlLen = 0;
-			int lrLen = 0;
-			int llLen = 0;
 
-			if (ptr->nextR() != nullptr) {
-				rrLen = subTreeLength(ptr->nextR()->nextR());
-				rlLen = subTreeLength(ptr->nextR()->nextL());
-			}
-			if (ptr->nextL() != nullptr) {
-				lrLen = subTreeLength(ptr->nextL()->nextR());
-				llLen = subTreeLength(ptr->nextL()->nextL());
-			}
-			int maxLen = std::max(std::max(rrLen, rlLen), std::max(lrLen, llLen));
+			//printf("%d\n", ptr->getHeight());
+			if (ptr->getBalanceFactor() > 1) {
 
-			
-			if (rrLen == maxLen) { /* Right node Right branch */
-			/*				|								|
-						   ptr								A
-						  /   \							  /   \
-						 c     A						ptr    e
-						c     / \					   /   \    e
-					 |	     p	 e	 		====>	  c     p    e
-					 |	  	p	  e	 				 c       p    e
-					2|   1|  	   e
-					 |    |			e
-			*/
-				printf("RR\n");
-				RR(H, ptr);
+				int temp = 0;
+				if (ptr->nextR() != nullptr)
+					temp = ptr->nextR()->getBalanceFactor();
+				if (temp > 0)
+					RR(H, ptr);
+				else
+					RL(H, ptr);
 			}
-			else if (rlLen == maxLen) { /* Right node Left branch */
-			/*				|								|
-						   ptr								A
-						  /   \							  /   \
-						g      B						ptr	   B
-					   g     /  \					    / \	  / \
-					 	   A	 d	^		====>	   g   e f   d
-						  / \	  d	|				   g   e f   d
-					     e   f		|	2			
-						e	  f		v
-			*/
-				printf("RL\n");
-				RL(H, ptr);
-			}
-			else if (lrLen == maxLen) { /* Left node Right branch */
-			/*				|								|
-						   ptr								A
-						  /   \							  /   \
-						B      g						 B	  ptr
-					  /   \     g					    / \	  / \
-					 d	   A		^		====>	   d   e f   g
-					d	  / \		|				   d   e f   g
-						 e   f		|	2
-						e	  f		v
-			*/
-				printf("LR\n");
-				LR(H, ptr);
-			}
-			else { /* Left node Left branch */
-			/*				|								|
-						   ptr								A
-						  /   \							  /   \
-						 A     c					     e    ptr
-					    / \     c				        e    /   \
-					   e   p 	   |2		====>	   e    p     c
-					  e  	p	   |				  e    p       c
-					 e    | 	   |  			
-					e     |1	   |
-			*/
-                printf("LL\n");
-				LL(H, ptr);
+			else if (ptr->getBalanceFactor() < -1) {
+				int temp = 0;
+				if (ptr->nextL() != nullptr)
+					temp = ptr->nextL()->getBalanceFactor();
+				if (temp > 0)
+					LR(H, ptr);
+				else
+					LL(H, ptr);
 			}
 		}
 		iter = anchor;
@@ -171,7 +167,7 @@ void AVL::rotate(node* iter) {
 
 
 bool AVL::isSubTreeAVL(node* ptr) {
-	if (abs(subTreeLength(ptr->nextL()) - subTreeLength(ptr->nextR()))<=1) {
+	if (abs(ptr->getBalanceFactor())<2) {
 		return true;
 	}
 	return false;

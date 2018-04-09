@@ -1,0 +1,60 @@
+/*if (ptr->getBalanceFactor() > 2 ) {
+				if (rrLen == maxLen) { /* Right node Right branch */
+				/*				|								|
+							   ptr								A
+							  /   \							  /   \
+							 c     A						ptr    e
+							c     / \					   /   \    e
+						 |	     p	 e	 		====>	  c     p    e
+						 |	  	p	  e	 				 c       p    e
+						2|   1|  	   e
+						 |    |			e
+				*/
+				//printf("RR\n");
+					RR(H, ptr);
+				}
+				else if (rlLen == maxLen) { /* Right node Left branch */
+				/*				|								|
+							   ptr								A
+							  /   \							  /   \
+							g      B						ptr	   B
+						   g     /  \					    / \	  / \
+							   A	 d	^		====>	   g   e f   d
+							  / \	  d	|				   g   e f   d
+							 e   f		|	2
+							e	  f		v
+				*/
+				//printf("RL\n");
+					RL(H, ptr);
+				}
+			}
+			else if (ptr->getBalanceFactor() < -2) {
+				if (lrLen == maxLen) { /* Left node Right branch */
+				/*				|								|
+							   ptr								A
+							  /   \							  /   \
+							B      g						 B	  ptr
+						  /   \     g					    / \	  / \
+						 d	   A		^		====>	   d   e f   g
+						d	  / \		|				   d   e f   g
+							 e   f		|	2
+							e	  f		v
+				*/
+				//printf("LR\n");
+					LR(H, ptr);
+				}
+				else { /* Left node Left branch */
+				/*				|								|
+							   ptr								A
+							  /   \							  /   \
+							 A     c					     e    ptr
+							/ \     c				        e    /   \
+						   e   p 	   |2		====>	   e    p     c
+						  e  	p	   |				  e    p       c
+						 e    | 	   |
+						e     |1	   |
+				*/
+				//printf("LL\n");
+					LL(H, ptr);
+				}
+			}*/
